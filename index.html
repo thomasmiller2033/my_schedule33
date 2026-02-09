@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Morning & Evening Schedule</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .schedule-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .morning-header {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+        }
+
+        .evening-header {
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+        }
+
+        .section-header h2 {
+            font-size: 1.8em;
+            color: #2d3436;
+        }
+
+        .section-header .icon {
+            font-size: 2em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 10px;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        th:first-child {
+            width: 100px;
+        }
+
+        td {
+            padding: 12px 10px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        td:first-child {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.95em;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:hover {
+            background: #e9ecef;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .morning-cell input {
+            border-left: 4px solid #ffeaa7;
+        }
+
+        .morning-cell input:focus {
+            border-left-color: #fdcb6e;
+        }
+
+        .evening-cell input {
+            border-left: 4px solid #a29bfe;
+        }
+
+        .evening-cell input:focus {
+            border-left-color: #6c5ce7;
+        }
+
+        tr:hover td:not(:first-child) {
+            background: #f1f3f5;
+        }
+
+        .work-break {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            border-radius: 10px;
+            margin: 30px 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            input {
+                border: none;
+                background: transparent;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th, td {
+                padding: 8px 5px;
+            }
+        }
+
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+        }
+
+        .btn-import {
+            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+            color: white;
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+            color: white;
+        }
+
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #00b894;
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        #importFile {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="save-indicator" id="saveIndicator">✓ Saved</div>
+    
+    <div class="container">
+        <h1>📅 Weekly Schedule</h1>
+        <p class="subtitle">Morning & Evening Routines • Auto-saves as you type</p>
+
+        <div class="controls">
+            <button class="btn btn-export" onclick="exportSchedule()">📥 Export Schedule</button>
+            <button class="btn btn-import" onclick="document.getElementById('importFile').click()">📤 Import Schedule</button>
+            <button class="btn btn-clear" onclick="clearSchedule()">🗑️ Clear All</button>
+            <input type="file" id="importFile" accept=".json" onchange="importSchedule(event)">
+        </div>
+
+        <!-- Morning Schedule -->
+        <div class="schedule-section">
+            <div class="section-header morning-header">
+                <span class="icon">🌅</span>
+                <h2>Morning Routine (6:00 AM - 8:30 AM)</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                        <th>Saturday</th>
+                        <th>Sunday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>6:00 AM</td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>6:30 AM</td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>7:00 AM</td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>7:30 AM</td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>8:00 AM</td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="morning-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Work Hours Indicator -->
+        <div class="work-break">
+            💼 WORK HOURS (8:30 AM - 5:30 PM)
+        </div>
+
+        <!-- Evening Schedule -->
+        <div class="schedule-section">
+            <div class="section-header evening-header">
+                <span class="icon">🌙</span>
+                <h2>Evening Routine (5:30 PM - 10:00 PM)</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                        <th>Saturday</th>
+                        <th>Sunday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>5:30 PM</td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>6:00 PM</td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>6:30 PM</td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>7:00 PM</td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>7:30 PM</td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>8:00 PM</td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>8:30 PM</td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>9:00 PM</td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                    <tr>
+                        <td>9:30 PM</td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                        <td class="evening-cell"><input type="text" placeholder="Add activity..."></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            loadSchedule();
+        });
+
+        // Auto-save on input change
+        document.addEventListener('input', function(e) {
+            if (e.target.tagName === 'INPUT') {
+                saveSchedule();
+                showSaveIndicator();
+            }
+        });
+
+        function saveSchedule() {
+            const inputs = document.querySelectorAll('input[type="text"]');
+            const scheduleData = {};
+            
+            inputs.forEach((input, index) => {
+                scheduleData[`input_${index}`] = input.value;
+            });
+            
+            localStorage.setItem('weeklySchedule', JSON.stringify(scheduleData));
+        }
+
+        function loadSchedule() {
+            const savedData = localStorage.getItem('weeklySchedule');
+            
+            if (savedData) {
+                const scheduleData = JSON.parse(savedData);
+                const inputs = document.querySelectorAll('input[type="text"]');
+                
+                inputs.forEach((input, index) => {
+                    const key = `input_${index}`;
+                    if (scheduleData[key]) {
+                        input.value = scheduleData[key];
+                    }
+                });
+            }
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 1500);
+        }
+
+        function exportSchedule() {
+            const savedData = localStorage.getItem('weeklySchedule');
+            
+            if (!savedData) {
+                alert('No schedule data to export. Add some activities first!');
+                return;
+            }
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(savedData);
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "my_weekly_schedule.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            
+            alert('Schedule exported successfully!');
+        }
+
+        function importSchedule(event) {
+            const file = event.target.files[0];
+            
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    localStorage.setItem('weeklySchedule', JSON.stringify(importedData));
+                    loadSchedule();
+                    alert('Schedule imported successfully!');
+                } catch (error) {
+                    alert('Error importing schedule. Please make sure the file is valid.');
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        function clearSchedule() {
+            if (confirm('Are you sure you want to clear all schedule data? This cannot be undone.')) {
+                localStorage.removeItem('weeklySchedule');
+                const inputs = document.querySelectorAll('input[type="text"]');
+                inputs.forEach(input => input.value = '');
+                alert('Schedule cleared!');
+            }
+        }
+    </script>
+</body>
+</html>
